@@ -1,4 +1,4 @@
-# airbnb_data_analysis
+# Airbnb Data Analysis
 
 ## Background
 You are a data scientist living in New York City. Recently, you were introduced to AirBnb by
