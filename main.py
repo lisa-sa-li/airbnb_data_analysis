@@ -59,16 +59,16 @@ nyc_data_clean['reviews_per_month'] = nyc_data_clean['reviews_per_month'].fillna
 
 # Get correlation of of price vs continous data
 for feature in nyc_cts_data:
-    corr, _ = pearsonr(nyc_price_feature, nyc_data_clean[feature])
-    print('Pearsons correlation of ' + feature + ': %.3f' % corr)
-    
-    # Plot correlation between price and feature
-    concat_df = pd.concat([nyc_price_feature_df, nyc_data_clean[feature]], ignore_index=True, axis=1)
-    concat_df.columns = ['price', feature]
-    # sns.pairplot(concat_df)
+  corr, _ = pearsonr(nyc_price_feature, nyc_data_clean[feature])
+  print('Pearsons correlation of ' + feature + ': %.3f' % corr)
+  
+  # Plot correlation between price and feature
+  concat_df = pd.concat([nyc_price_feature_df, nyc_data_clean[feature]], ignore_index=True, axis=1)
+  concat_df.columns = ['price', feature]
+  # sns.pairplot(concat_df)
 
-    # Pair plot of every continous feature vs each other, too long to run
-    # nyc_price_feature_df = pd.concat([nyc_price_feature_df, nyc_data_clean[feature]], ignore_index=True, axis=1)
+  # Pair plot of every continous feature vs each other, too long to run
+  # nyc_price_feature_df = pd.concat([nyc_price_feature_df, nyc_data_clean[feature]], ignore_index=True, axis=1)
 
 # Pair plot of every continous feature vs each other, too long to run
 # nyc_price_feature_df.columns = ['price'] + nyc_cts_feats
@@ -81,20 +81,16 @@ for feature in nyc_cts_data:
 # Store sorted lists of each categorical feature in nyc_cat_price
 nyc_cat_price = []
 for feature in nyc_cat_feats:
-    print("\n" + feature)
-    list_feats = []
-    for unique in nyc_data_clean[feature].unique():
-        list_feats.append([nyc_data[nyc_data[feature] == unique]['price'].mean(), unique])
-    
-    list_feats.sort(reverse=True)
-    nyc_cat_price.append(list_feats)
+  print("\n" + feature)
+  list_feats = []
+  for unique in nyc_data_clean[feature].unique():
+    list_feats.append([nyc_data[nyc_data[feature] == unique]['price'].mean(), unique])
+  
+  list_feats.sort(reverse=True)
+  nyc_cat_price.append(list_feats)
 
-    for i in list_feats:
-        print(i[1], "%.2f" % i[0])
-
-# print(nyc_data_clean.loc[nyc_data_clean['neighbourhood'] == 'Riverdale'])
-
-nyc_neighbourhood = nyc_cat_price[1]
+  for i in list_feats:
+    print(i[1], "%.2f" % i[0])
 
 # Create new dataframes of price and each categorical feature and plot
 nyc_cat_price_df = pd.DataFrame(nyc_cat_price[1])
@@ -104,29 +100,62 @@ nyc_cat_price_df2.columns = ['price', 'neighbourhood group']
 nyc_cat_price_df3 = pd.DataFrame(nyc_cat_price[2])
 nyc_cat_price_df3.columns = ['price', 'room type']
 
-print(nyc_cat_price_df3.columns[1])
+# Plot price vs each categorical data
+# for df in [nyc_cat_price_df, nyc_cat_price_df2, nyc_cat_price_df3]:
+#   plt.figure(figsize = (6, 6))
+#   bar = sns.barplot(x = df.columns[1], y = 'price', data=df)
+#   xt = plt.xticks(rotation=90)
+#   fig = bar.get_figure()
+#   fig.savefig(df.columns[1] + "_price.png")
+
+# Top 10 neighbourhoods by price
+print(nyc_cat_price[1][0:11])
+print(nyc_cat_price_df[0:11]['neighbourhood'])
+
+# Plot room type vs avg price of top 10 neighbourhoods
+for neighbourhood in nyc_cat_price_df[0:10]['neighbourhood']:
+  # print("neighbourhood", neighbourhood)
+  avg_room_type_df = nyc_data_clean.loc[nyc_data_clean['neighbourhood'] == neighbourhood].groupby('room_type', as_index=False).mean()
+  if avg_room_type_df.shape[0] == 1:
+    plt.figure(figsize = (2, 6))
+  elif avg_room_type_df.shape[0] == 2:
+    plt.figure(figsize = (4, 6))
+  else:
+    plt.figure(figsize = (6, 6))
+  # bar = sns.barplot(x='room_type', y='price', data=avg_room_type_df).set_title(neighbourhood)
+
+# Plot room type vs frequency of top 10 neighbourhoods
+for neighbourhood in nyc_cat_price_df[0:10]['neighbourhood']:
+  freq_room_type_df = nyc_data_clean.loc[nyc_data_clean['neighbourhood'] == neighbourhood].groupby('room_type', as_index=False).count()
+  if freq_room_type_df.shape[0] == 1:
+    plt.figure(figsize = (2, 6))
+  elif freq_room_type_df.shape[0] == 2:
+    plt.figure(figsize = (4, 6))
+  else:
+    plt.figure(figsize = (6, 6))
+  bar = sns.barplot(x='room_type', y='price', data=freq_room_type_df).set_title(neighbourhood)
 
 
-plt.figure(figsize = (6, 6))
-# bar = sns.barplot(x = 'neighbourhood', y = 'price', data=nyc_cat_price_df)
-bar2 = sns.barplot(x = 'neighbourhood group', y = 'price', data=nyc_cat_price_df2)
-# bar3 = sns.barplot(x = 'room type', y = 'price', data=nyc_cat_price_df3)
-xt = plt.xticks(rotation=90)
-# fig = bar.get_figure()
-fig2 = bar2.get_figure()
-# fig3 = bar3.get_figure()
-# fig.savefig("neighbourhood_price.png")
-fig2.savefig("neighbourhood_group_price.png")
-# fig3.savefig("room_type_price.png")
+# print(pd.melt(nyc_data_clean.loc[nyc_data_clean['neighbourhood'] == 'Riverdale'].groupby('room_type', as_index=False).count(), id_vars =['room_type'], value_vars ='price', value_name ='frequency'))
 
 
+# bar = sns.catplot(x='room_type', y='price', hue="kind", col="neighbourhood", data=nyc_data_clean)
 
-nyc_neighbourhood_manhattan = []
-nyc_neighbourhood_entirehome = []
-nyc_neighbourhood_both = []
-# plt.figure(figsize = (12, 6))
-# sns.boxplot(x = 'neighbourhood_cleansed', y = 'price',  data = boston_data_clean)
 # xt = plt.xticks(rotation=90)
+# fig = bar.get_figure()
+
+
+# fig.savefig(df.columns[1] + "_price.png")
+# sns.boxplot(x='neighbourhood', y='price', data=nyc_cat_price_df)
+
+# xt = plt.xticks(rotation=90)
+
+
+# nyc_neighbourhood = nyc_cat_price[1]
+# nyc_neighbourhood_manhattan = []
+# nyc_neighbourhood_entirehome = []
+# nyc_neighbourhood_both = []
+
 
 
 
