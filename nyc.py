@@ -114,7 +114,6 @@ print(nyc_cat_price_df[0:11]['neighbourhood'])
 
 # Plot room type vs avg price of top 10 neighbourhoods
 for neighbourhood in nyc_cat_price_df[0:10]['neighbourhood']:
-  # print("neighbourhood", neighbourhood)
   avg_room_type_df = nyc_data_clean.loc[nyc_data_clean['neighbourhood'] == neighbourhood].groupby('room_type', as_index=False).mean()
   if avg_room_type_df.shape[0] == 1:
     plt.figure(figsize = (2, 6))
@@ -149,7 +148,6 @@ for neighbourhood in nyc_cat_price_df[0:10]['neighbourhood']:
 # sns.boxplot(x='neighbourhood', y='price', data=nyc_cat_price_df)
 
 # xt = plt.xticks(rotation=90)
-
 
 # nyc_neighbourhood = nyc_cat_price[1]
 # nyc_neighbourhood_manhattan = []
