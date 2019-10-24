@@ -1,5 +1,6 @@
 import pandas as pd
 from scipy.stats import pearsonr
+from scipy.stats import spearmanr
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -42,10 +43,12 @@ nyc_price_feature_df = pd.DataFrame(nyc_price_feature)
 # Replace NaN in reviews_per_month with 0
 nyc_data_clean['reviews_per_month'] = nyc_data_clean['reviews_per_month'].fillna(0)
 
-# Get correlation of of price vs continous data
+# Get correlation of price vs continous data
 for feature in nyc_cts_data:
-  corr, _ = pearsonr(nyc_price_feature, nyc_data_clean[feature])
-  print('Pearsons correlation of ' + feature + ': %.3f' % corr)
+  p_corr, _ = pearsonr(nyc_price_feature, nyc_data_clean[feature])
+  s_corr, _ = spearmanr(nyc_price_feature, nyc_data_clean[feature])
+  print('Pearsons correlation of ' + feature + ': %.3f' % p_corr)
+  print('Spearmans correlation of ' + feature + ': %.3f' % s_corr + '\n')
 
   # Plot correlation between price and feature
   concat_df = pd.concat([nyc_price_feature_df, nyc_data_clean[feature]], ignore_index=True, axis=1)
